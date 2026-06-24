@@ -95,6 +95,13 @@ const ComplaintTable = ({
             Selesai
           </span>
         );
+      case 'ditolak':
+        return (
+          <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700 border border-rose-200">
+            <span className="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+            Ditolak
+          </span>
+        );
       default:
         return null;
     }
@@ -138,6 +145,7 @@ const ComplaintTable = ({
             <option value="pending">Tertunda (Pending)</option>
             <option value="proses">Diproses</option>
             <option value="selesai">Selesai</option>
+            <option value="ditolak">Ditolak</option>
           </select>
         </div>
       </div>
@@ -191,6 +199,23 @@ const ComplaintTable = ({
                     <div>
                       <p className="font-semibold text-slate-800 line-clamp-1">{item.title}</p>
                       <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">{item.content}</p>
+                      {item.image_url && (
+                        <div className="mt-2">
+                          <a 
+                            href={item.image_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[10px] font-semibold text-violet-600 hover:text-violet-500 hover:underline"
+                          >
+                            <img 
+                              src={item.image_url} 
+                              alt="Bukti Foto" 
+                              className="h-8 w-8 rounded-lg object-cover border border-slate-200 mr-1"
+                            />
+                            <span>Lihat Bukti Foto</span>
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </td>
                   
@@ -221,6 +246,7 @@ const ComplaintTable = ({
                         <option value="pending">Tertunda</option>
                         <option value="proses">Diproses</option>
                         <option value="selesai">Selesai</option>
+                        <option value="ditolak">Ditolak</option>
                       </select>
                     ) : (
                       getStatusBadge(item.status)
