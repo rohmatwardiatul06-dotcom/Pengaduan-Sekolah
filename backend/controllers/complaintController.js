@@ -49,10 +49,9 @@ const getComplaintById = async (req, res, next) => {
   }
 };
 
-// Create a new complaint
 const createComplaint = async (req, res, next) => {
   try {
-    const { title, content, category, imageUrl } = req.body;
+    const { title, content, category } = req.body;
     const userId = req.user.id;
 
     // Backend Validation
@@ -66,6 +65,12 @@ const createComplaint = async (req, res, next) => {
     const validCategories = ['Fasilitas', 'Akademik', 'Disiplin & Bullying', 'Administrasi & Keuangan'];
     if (!category || !validCategories.includes(category)) {
       return res.status(400).json({ message: 'Kategori pengaduan tidak valid.' });
+    }
+
+    // Handle Uploaded File
+    let imageUrl = null;
+    if (req.file) {
+      imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
     }
 
     const complaintId = await Complaint.create({
@@ -89,7 +94,7 @@ const createComplaint = async (req, res, next) => {
 const updateComplaint = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { title, content, category, status, imageUrl } = req.body;
+    const { title, content, category, status } = req.body;
     const { id: userId, role } = req.user;
 
     const complaint = await Complaint.findById(id);
@@ -133,10 +138,16 @@ const updateComplaint = async (req, res, next) => {
 
     // If Admin is updating status
     if (role === 'admin' && status !== undefined) {
-      const validStatuses = ['pending', 'proses', 'selesai'];
+      const validStatuses = ['pending', 'proses', 'selesai', 'ditolak'];
       if (!validStatuses.includes(status)) {
         return res.status(400).json({ message: 'Status pengaduan tidak valid.' });
       }
+    }
+
+    // Handle Uploaded File for Edit
+    let imageUrl = undefined;
+    if (req.file) {
+      imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
     }
 
     const updated = await Complaint.update(id, {
