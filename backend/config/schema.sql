@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS complaints (
   title VARCHAR(255) NOT NULL,
   content TEXT NOT NULL,
   category ENUM('Fasilitas', 'Akademik', 'Disiplin & Bullying', 'Administrasi & Keuangan') NOT NULL,
-  status ENUM('pending', 'proses', 'selesai') DEFAULT 'pending',
+  status ENUM('pending', 'proses', 'selesai', 'ditolak') DEFAULT 'pending',
   image_url VARCHAR(255) NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
