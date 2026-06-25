@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import API from '../services/api';
 import StatCard from '../components/StatCard';
-import { ClipboardList, AlertCircle, RefreshCw, CheckCircle } from 'lucide-react';
+import { ClipboardList, AlertCircle, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const [stats, setStats] = useState({ total: 0, pending: 0, proses: 0, selesai: 0 });
+  const [stats, setStats] = useState({ total: 0, pending: 0, proses: 0, selesai: 0, ditolak: 0 });
   const [loading, setLoading] = useState(true);
   const [recent, setRecent] = useState([]);
 
@@ -62,7 +62,7 @@ const Dashboard = () => {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
         <StatCard
           title="Total Laporan"
           value={stats.total}
@@ -94,6 +94,14 @@ const Dashboard = () => {
           colorClass="bg-emerald-50 text-emerald-600"
           borderClass="border-emerald-100"
           ringClass="hover:ring-emerald-50"
+        />
+        <StatCard
+          title="Laporan Ditolak"
+          value={stats.ditolak}
+          icon={XCircle}
+          colorClass="bg-rose-50 text-rose-600"
+          borderClass="border-rose-100"
+          ringClass="hover:ring-rose-50"
         />
       </div>
 
@@ -137,6 +145,9 @@ const Dashboard = () => {
                       )}
                       {item.status === 'selesai' && (
                         <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-100">Selesai</span>
+                      )}
+                      {item.status === 'ditolak' && (
+                        <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-[10px] font-semibold text-rose-700 border border-rose-100">Ditolak</span>
                       )}
                     </div>
                   </div>
