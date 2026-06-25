@@ -1,31 +1,39 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import { Edit2, Trash2, Calendar, Folder, User, Search, RefreshCw } from 'lucide-react';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import {
+  Edit2,
+  Trash2,
+  Calendar,
+  Folder,
+  User,
+  Search,
+  RefreshCw,
+} from "lucide-react";
 
-const ComplaintTable = ({ 
-  complaints, 
-  onDelete, 
-  onStatusChange, 
+const ComplaintTable = ({
+  complaints,
+  onDelete,
+  onStatusChange,
   loading = false,
-  showReporter = false 
+  showReporter = false,
 }) => {
   const { user } = useAuth();
-  
+
   // Search & Filter State
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
   const categories = [
-    'Fasilitas',
-    'Akademik',
-    'Disiplin & Bullying',
-    'Administrasi & Keuangan'
+    "Fasilitas",
+    "Akademik",
+    "Disiplin & Bullying",
+    "Administrasi & Keuangan",
   ];
 
   // Reset pagination on search/filter change
@@ -46,13 +54,15 @@ const ComplaintTable = ({
 
   // Filter complaints list
   const filteredComplaints = complaints.filter((item) => {
-    const matchesSearch = 
+    const matchesSearch =
       item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.username && item.username.toLowerCase().includes(searchTerm.toLowerCase()));
-      
-    const matchesCategory = categoryFilter === '' || item.category === categoryFilter;
-    const matchesStatus = statusFilter === '' || item.status === statusFilter;
+      (item.username &&
+        item.username.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchesCategory =
+      categoryFilter === "" || item.category === categoryFilter;
+    const matchesStatus = statusFilter === "" || item.status === statusFilter;
 
     return matchesSearch && matchesCategory && matchesStatus;
   });
@@ -61,34 +71,37 @@ const ComplaintTable = ({
   const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredComplaints.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredComplaints.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
     });
   };
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'pending':
+      case "pending":
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 border border-amber-200">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse"></span>
             Tertunda
           </span>
         );
-      case 'proses':
+      case "proses":
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 border border-blue-200">
             <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse"></span>
             Diproses
           </span>
         );
-      case 'selesai':
+      case "selesai":
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
@@ -121,7 +134,7 @@ const ComplaintTable = ({
             className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 transition-all"
           />
         </div>
-        
+
         <div className="flex flex-wrap w-full md:w-auto gap-3">
           {/* Category Filter */}
           <select
@@ -130,8 +143,10 @@ const ComplaintTable = ({
             className="px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
           >
             <option value="">Semua Kategori</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
             ))}
           </select>
 
@@ -166,7 +181,10 @@ const ComplaintTable = ({
           <tbody className="divide-y divide-slate-100">
             {loading ? (
               <tr>
-                <td colSpan={showReporter ? 6 : 5} className="px-6 py-12 text-center text-slate-400">
+                <td
+                  colSpan={showReporter ? 6 : 5}
+                  className="px-6 py-12 text-center text-slate-400"
+                >
                   <div className="flex justify-center items-center gap-2">
                     <RefreshCw className="h-5 w-5 animate-spin text-violet-500" />
                     <span>Memuat data pengaduan...</span>
@@ -175,13 +193,19 @@ const ComplaintTable = ({
               </tr>
             ) : currentItems.length === 0 ? (
               <tr>
-                <td colSpan={showReporter ? 6 : 5} className="px-6 py-12 text-center text-slate-400">
+                <td
+                  colSpan={showReporter ? 6 : 5}
+                  className="px-6 py-12 text-center text-slate-400"
+                >
                   Tidak ditemukan laporan pengaduan.
                 </td>
               </tr>
             ) : (
               currentItems.map((item) => (
-                <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                <tr
+                  key={item.id}
+                  className="hover:bg-slate-50/50 transition-colors"
+                >
                   {/* Reporter Username (for Admin view) */}
                   {showReporter && (
                     <td className="px-6 py-4 font-medium text-slate-900">
@@ -193,7 +217,7 @@ const ComplaintTable = ({
                       </div>
                     </td>
                   )}
-                  
+
                   {/* Title and Short Content */}
                   <td className="px-6 py-4">
                     <div>
@@ -218,7 +242,7 @@ const ComplaintTable = ({
                       )}
                     </div>
                   </td>
-                  
+
                   {/* Category */}
                   <td className="px-6 py-4">
                     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
@@ -226,7 +250,7 @@ const ComplaintTable = ({
                       {item.category}
                     </span>
                   </td>
-                  
+
                   {/* Date */}
                   <td className="px-6 py-4 text-slate-500 text-xs">
                     <div className="flex items-center gap-1.5">
@@ -234,13 +258,15 @@ const ComplaintTable = ({
                       {formatDate(item.created_at)}
                     </div>
                   </td>
-                  
+
                   {/* Status Badge or Admin Selector */}
                   <td className="px-6 py-4">
-                    {user?.role === 'admin' ? (
+                    {user?.role === "admin" ? (
                       <select
                         value={item.status}
-                        onChange={(e) => onStatusChange(item.id, e.target.value)}
+                        onChange={(e) =>
+                          onStatusChange(item.id, e.target.value)
+                        }
                         className="text-xs font-semibold rounded-lg bg-slate-50 border border-slate-200 px-2 py-1 text-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-200"
                       >
                         <option value="pending">Tertunda</option>
@@ -252,11 +278,11 @@ const ComplaintTable = ({
                       getStatusBadge(item.status)
                     )}
                   </td>
-                  
+
                   {/* Actions */}
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {user?.role !== 'admin' && item.status === 'pending' ? (
+                      {user?.role !== "admin" && item.status === "pending" ? (
                         <>
                           <Link
                             to={`/edit/${item.id}`}
@@ -275,7 +301,9 @@ const ComplaintTable = ({
                         </>
                       ) : (
                         <span className="text-xs font-medium text-slate-400 select-none">
-                          {user?.role === 'admin' ? 'Kelola Status' : 'Terkunci'}
+                          {user?.role === "admin"
+                            ? "Kelola Status"
+                            : "Terkunci"}
                         </span>
                       )}
                     </div>
@@ -291,18 +319,22 @@ const ComplaintTable = ({
       {filteredComplaints.length > itemsPerPage && (
         <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
           <span className="text-xs font-medium text-slate-500">
-            Menampilkan {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, filteredComplaints.length)} dari {filteredComplaints.length} laporan
+            Menampilkan {indexOfFirstItem + 1} -{" "}
+            {Math.min(indexOfLastItem, filteredComplaints.length)} dari{" "}
+            {filteredComplaints.length} laporan
           </span>
           <div className="flex gap-2">
             <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium bg-white text-slate-600 disabled:opacity-50 transition-all hover:bg-slate-50"
             >
               Sebelumnya
             </button>
             <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
               className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium bg-white text-slate-600 disabled:opacity-50 transition-all hover:bg-slate-50"
             >
