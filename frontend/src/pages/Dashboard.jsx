@@ -74,14 +74,38 @@ const Dashboard = () => {
 
   // Admin Dashboard
   if (user?.role === 'admin') {
+    const categoriesList = [
+      'Fasilitas',
+      'Akademik',
+      'Disiplin & Bullying',
+      'Administrasi & Keuangan'
+    ];
+
+    const categoryStats = categoriesList.map(cat => {
+      const catComplaints = allComplaints.filter(c => c.category === cat);
+      return {
+        name: cat,
+        total: catComplaints.length,
+        pending: catComplaints.filter(c => c.status === 'pending').length,
+        proses: catComplaints.filter(c => c.status === 'proses').length,
+        selesai: catComplaints.filter(c => c.status === 'selesai').length,
+        ditolak: catComplaints.filter(c => c.status === 'ditolak').length
+      };
+    });
+
+    const completionRate = stats.total > 0 ? Math.round((stats.selesai / stats.total) * 100) : 0;
+
     return (
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Dashboard Administrator</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Pantau statistik ringkas dan kelola seluruh pengaduan siswa secara real-time.
-          </p>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-700 p-6 text-white shadow-md shadow-violet-600/10">
+          <div className="relative z-10">
+            <h1 className="text-2xl font-bold font-display">Dashboard Administrator</h1>
+            <p className="text-sm text-violet-100 mt-1">
+              Pantau statistik ringkas dan kelola seluruh pengaduan siswa secara real-time.
+            </p>
+          </div>
+          <div className="absolute -bottom-8 -right-8 h-32 w-32 rounded-full bg-white/5 opacity-20 pointer-events-none"></div>
         </div>
 
         {/* Statistics Cards */}
@@ -126,6 +150,73 @@ const Dashboard = () => {
             borderClass="border-rose-100"
             ringClass="hover:ring-rose-50"
           />
+        </div>
+
+        {/* Intermediate Statistics Grid */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Category Summary Table */}
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm overflow-hidden flex flex-col justify-between">
+            <div>
+              <h3 className="font-bold text-slate-800 text-base mb-4">Statistik Berdasarkan Kategori</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm text-slate-600 border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      <th className="px-4 py-3">Kategori</th>
+                      <th className="px-4 py-3 text-center">Total</th>
+                      <th className="px-4 py-3 text-center text-amber-600">Pending</th>
+                      <th className="px-4 py-3 text-center text-blue-600">Proses</th>
+                      <th className="px-4 py-3 text-center text-emerald-600">Selesai</th>
+                      <th className="px-4 py-3 text-center text-rose-600">Ditolak</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {categoryStats.map((row) => (
+                      <tr key={row.name} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="px-4 py-3 font-semibold text-slate-700">{row.name}</td>
+                        <td className="px-4 py-3 text-center font-bold text-slate-900 bg-slate-50/50">{row.total}</td>
+                        <td className="px-4 py-3 text-center font-medium text-amber-600">{row.pending}</td>
+                        <td className="px-4 py-3 text-center font-medium text-blue-600">{row.proses}</td>
+                        <td className="px-4 py-3 text-center font-medium text-emerald-600">{row.selesai}</td>
+                        <td className="px-4 py-3 text-center font-medium text-rose-600">{row.ditolak}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Performance Circular/Bar Completion Card */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+            <div>
+              <h3 className="font-bold text-slate-800 text-base mb-4">Tingkat Penyelesaian</h3>
+              <div className="flex flex-col items-center justify-center py-4">
+                {/* Circular indicator simulating modern progress */}
+                <div className="relative flex items-center justify-center h-28 w-28 rounded-full bg-violet-50 text-violet-600">
+                  <span className="text-2xl font-black">{completionRate}%</span>
+                  <div className="absolute inset-0 rounded-full border-4 border-slate-100"></div>
+                  <div className="absolute inset-0 rounded-full border-4 border-violet-600 border-t-transparent animate-pulse pointer-events-none"></div>
+                </div>
+                
+                <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-slate-400 text-center">
+                  Rasio Laporan Selesai
+                </p>
+                <p className="mt-2 text-xs text-slate-500 text-center leading-relaxed">
+                  Dari total <b>{stats.total}</b> laporan yang masuk, sebanyak <b>{stats.selesai}</b> laporan telah diselesaikan dengan sukses.
+                </p>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-100 pt-4">
+              <div className="w-full bg-slate-100 rounded-full h-2">
+                <div 
+                  className="bg-violet-600 h-2 rounded-full transition-all duration-500" 
+                  style={{ width: `${completionRate}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Management Table Component for Admin */}
