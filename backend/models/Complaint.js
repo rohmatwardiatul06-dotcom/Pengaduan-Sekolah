@@ -101,12 +101,13 @@ class Complaint {
     return result.affectedRows > 0;
   }
 
-  // Calculate statistics (total, pending, proses, selesai)
+  // Calculate statistics (total, pending, proses, selesai, ditolak)
   static async getStats(userId, role) {
     let sqlTotal = 'SELECT COUNT(*) as total FROM complaints';
     let sqlPending = "SELECT COUNT(*) as pending FROM complaints WHERE status = 'pending'";
     let sqlProses = "SELECT COUNT(*) as proses FROM complaints WHERE status = 'proses'";
     let sqlSelesai = "SELECT COUNT(*) as selesai FROM complaints WHERE status = 'selesai'";
+    let sqlDitolak = "SELECT COUNT(*) as ditolak FROM complaints WHERE status = 'ditolak'";
     
     const params = [];
     if (role !== 'admin' && userId) {
@@ -115,6 +116,7 @@ class Complaint {
       sqlPending += ' AND user_id = ?';
       sqlProses += ' AND user_id = ?';
       sqlSelesai += ' AND user_id = ?';
+      sqlDitolak += ' AND user_id = ?';
       params.push(userId);
     }
 
@@ -124,16 +126,19 @@ class Complaint {
     const pendingParams = [...params];
     const prosesParams = [...params];
     const selesaiParams = [...params];
+    const ditolakParams = [...params];
 
     const [pendingRes] = await db.query(sqlPending, pendingParams);
     const [prosesRes] = await db.query(sqlProses, prosesParams);
     const [selesaiRes] = await db.query(sqlSelesai, selesaiParams);
+    const [ditolakRes] = await db.query(sqlDitolak, ditolakParams);
 
     return {
       total: totalRes.total,
       pending: pendingRes.pending,
       proses: prosesRes.proses,
-      selesai: selesaiRes.selesai
+      selesai: selesaiRes.selesai,
+      ditolak: ditolakRes.ditolak
     };
   }
 }
