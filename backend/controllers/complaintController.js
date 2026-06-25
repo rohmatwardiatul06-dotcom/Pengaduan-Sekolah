@@ -51,7 +51,10 @@ const getComplaintById = async (req, res, next) => {
 
 const createComplaint = async (req, res, next) => {
   try {
-    const { title, content, category } = req.body;
+    const body = req.body || {};
+    const title = body.title;
+    const content = body.content;
+    const category = body.category;
     const userId = req.user.id;
 
     // Backend Validation
@@ -78,7 +81,7 @@ const createComplaint = async (req, res, next) => {
       title: title.trim(),
       content: content.trim(),
       category,
-      imageUrl
+      image_url: imageUrl
     });
 
     res.status(201).json({
@@ -94,7 +97,7 @@ const createComplaint = async (req, res, next) => {
 const updateComplaint = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { title, content, category, status } = req.body;
+    const { title, content, category, status } = req.body || {};
     const { id: userId, role } = req.user;
 
     const complaint = await Complaint.findById(id);
@@ -105,23 +108,18 @@ const updateComplaint = async (req, res, next) => {
 
     // Authorization Check
     if (role !== 'admin') {
-      // User can only update their own complaint
       if (complaint.user_id !== userId) {
         return res.status(403).json({ message: 'Akses ditolak. Anda tidak berwenang mengedit pengaduan ini.' });
       }
-      
-      // User can only update if status is still pending
       if (complaint.status !== 'pending') {
         return res.status(400).json({ message: 'Laporan tidak dapat diubah karena sedang diproses atau sudah selesai.' });
       }
-
-      // User cannot update status
       if (status !== undefined && status !== complaint.status) {
         return res.status(400).json({ message: 'User tidak berwenang mengubah status pengaduan.' });
       }
     }
 
-    // If validating inputs for non-admin updates
+    // Input Validation for non-admin updates
     if (role !== 'admin') {
       if (title !== undefined && title.trim().length < 5) {
         return res.status(400).json({ message: 'Judul pengaduan harus minimal 5 karakter.' });
@@ -136,7 +134,7 @@ const updateComplaint = async (req, res, next) => {
       }
     }
 
-    // If Admin is updating status
+    // Admin status validation
     if (role === 'admin' && status !== undefined) {
       const validStatuses = ['pending', 'proses', 'selesai', 'ditolak'];
       if (!validStatuses.includes(status)) {
@@ -144,18 +142,18 @@ const updateComplaint = async (req, res, next) => {
       }
     }
 
-    // Handle Uploaded File for Edit
-    let imageUrl = undefined;
+    // PERBAIKAN LOGIKA GAMBAR: Jika tidak upload gambar baru, pakai gambar yang lama agar tidak ter-reset jadi null/undefined
+    let imageUrl = complaint.image_url; 
     if (req.file) {
       imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
     }
 
     const updated = await Complaint.update(id, {
-      title,
-      content,
-      category,
-      status,
-      imageUrl
+      title: title !== undefined ? title.trim() : complaint.title,
+      content: content !== undefined ? content.trim() : complaint.content,
+      category: category || complaint.category,
+      status: status || complaint.status,
+      image_url: imageUrl
     });
 
     if (!updated) {
@@ -180,13 +178,10 @@ const deleteComplaint = async (req, res, next) => {
       return res.status(404).json({ message: 'Pengaduan tidak ditemukan.' });
     }
 
-    // Authorization Check
     if (role !== 'admin') {
-      // User can only delete their own
       if (complaint.user_id !== userId) {
         return res.status(403).json({ message: 'Akses ditolak. Anda tidak berwenang menghapus pengaduan ini.' });
       }
-      // User can only delete if status is pending
       if (complaint.status !== 'pending') {
         return res.status(400).json({ message: 'Laporan tidak dapat dihapus karena sudah dalam proses atau selesai.' });
       }
