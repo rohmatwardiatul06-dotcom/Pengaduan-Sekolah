@@ -9,11 +9,11 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState('user'); // Default to user, but allow selection for testing
-  
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [serverMsg, setServerMsg] = useState({ type: '', text: '' });
-  
+
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -88,11 +88,10 @@ const Register = () => {
         {/* Card Container */}
         <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
           {serverMsg.text && (
-            <div className={`mb-6 p-4 rounded-xl flex items-start gap-2.5 text-sm ${
-              serverMsg.type === 'success' 
-                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
+            <div className={`mb-6 p-4 rounded-xl flex items-start gap-2.5 text-sm ${serverMsg.type === 'success'
+                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                 : 'bg-rose-50 text-rose-800 border border-rose-200'
-            }`}>
+              }`}>
               {serverMsg.type === 'success' ? (
                 <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
               ) : (
@@ -117,11 +116,10 @@ const Register = () => {
                   if (errors.username) setErrors(prev => ({ ...prev, username: '' }));
                 }}
                 placeholder="nama_lengkap"
-                className={`w-full px-4 py-2 rounded-xl border bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 text-sm ${
-                  errors.username 
-                    ? 'border-rose-300 focus:ring-rose-200 focus:border-rose-400' 
+                className={`w-full px-4 py-2 rounded-xl border bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 text-sm ${errors.username
+                    ? 'border-rose-300 focus:ring-rose-200 focus:border-rose-400'
                     : 'border-slate-200 focus:ring-violet-200 focus:border-violet-400'
-                }`}
+                  }`}
               />
               {errors.username && (
                 <p className="mt-1 text-xs text-rose-600 flex items-center gap-1">
@@ -144,11 +142,10 @@ const Register = () => {
                   if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
                 }}
                 placeholder="nama@sekolah.sch.id"
-                className={`w-full px-4 py-2 rounded-xl border bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 text-sm ${
-                  errors.email 
-                    ? 'border-rose-300 focus:ring-rose-200 focus:border-rose-400' 
+                className={`w-full px-4 py-2 rounded-xl border bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 text-sm ${errors.email
+                    ? 'border-rose-300 focus:ring-rose-200 focus:border-rose-400'
                     : 'border-slate-200 focus:ring-violet-200 focus:border-violet-400'
-                }`}
+                  }`}
               />
               {errors.email && (
                 <p className="mt-1 text-xs text-rose-600 flex items-center gap-1">
@@ -157,21 +154,6 @@ const Register = () => {
               )}
             </div>
 
-            {/* Role (for demo and testing authorization) */}
-            <div>
-              <label htmlFor="role" className="block text-sm font-semibold text-slate-700 mb-1">
-                Pilih Peran (Role) untuk Pengujian
-              </label>
-              <select
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full px-4 py-2 rounded-xl border bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 transition-all duration-200 text-sm border-slate-200"
-              >
-                <option value="user">Siswa / User Biasa</option>
-                <option value="admin">Admin Sekolah (Verifikator)</option>
-              </select>
-            </div>
 
             {/* Password */}
             <div>
@@ -187,11 +169,10 @@ const Register = () => {
                   if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
                 }}
                 placeholder="min 6 karakter"
-                className={`w-full px-4 py-2 rounded-xl border bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 text-sm ${
-                  errors.password 
-                    ? 'border-rose-300 focus:ring-rose-200 focus:border-rose-400' 
+                className={`w-full px-4 py-2 rounded-xl border bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 text-sm ${errors.password
+                    ? 'border-rose-300 focus:ring-rose-200 focus:border-rose-400'
                     : 'border-slate-200 focus:ring-violet-200 focus:border-violet-400'
-                }`}
+                  }`}
               />
               {errors.password && (
                 <p className="mt-1 text-xs text-rose-600 flex items-center gap-1">
@@ -214,11 +195,10 @@ const Register = () => {
                   if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' }));
                 }}
                 placeholder="masukkan kembali password"
-                className={`w-full px-4 py-2 rounded-xl border bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 text-sm ${
-                  errors.confirmPassword 
-                    ? 'border-rose-300 focus:ring-rose-200 focus:border-rose-400' 
+                className={`w-full px-4 py-2 rounded-xl border bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 text-sm ${errors.confirmPassword
+                    ? 'border-rose-300 focus:ring-rose-200 focus:border-rose-400'
                     : 'border-slate-200 focus:ring-violet-200 focus:border-violet-400'
-                }`}
+                  }`}
               />
               {errors.confirmPassword && (
                 <p className="mt-1 text-xs text-rose-600 flex items-center gap-1">
