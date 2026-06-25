@@ -81,7 +81,7 @@ const createComplaint = async (req, res, next) => {
       title: title.trim(),
       content: content.trim(),
       category,
-      image_url: imageUrl
+      imageUrl: imageUrl
     });
 
     res.status(201).json({
@@ -153,7 +153,7 @@ const updateComplaint = async (req, res, next) => {
       content: content !== undefined ? content.trim() : complaint.content,
       category: category || complaint.category,
       status: status || complaint.status,
-      image_url: imageUrl
+      imageUrl: imageUrl
     });
 
     if (!updated) {
