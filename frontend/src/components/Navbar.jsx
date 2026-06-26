@@ -29,7 +29,7 @@ const Navbar = ({ sidebarOpen, setSidebarOpen }) => {
             Sistem Pengaduan Sekolah
           </h2>
           <h2 className="text-md font-bold text-slate-800 tracking-tight sm:hidden">
-            SIPEKAN
+            SIPESEK
           </h2>
         </div>
       </div>
