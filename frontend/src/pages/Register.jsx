@@ -81,7 +81,7 @@ const Register = () => {
             Daftar Akun Baru
           </h2>
           <p className="mt-2 text-center text-sm text-slate-500">
-            SD 1 Cigombong - Sistem Informasi Pengaduan Sekolah (SIPEKAN)
+            SD 1 Cigombong - Sistem Pengaduan Sekolah (SIPESEK)
           </p>
         </div>
 

@@ -345,7 +345,7 @@ const Dashboard = () => {
         {/* Right Side: Quick Action info box */}
         <div className="bg-gradient-to-br from-violet-600 to-indigo-700 rounded-2xl p-6 text-white shadow-md shadow-violet-600/10 flex flex-col justify-between">
           <div>
-            <h3 className="font-bold text-lg font-display">SIPEKAN Portal</h3>
+            <h3 className="font-bold text-lg font-display">SIPESEK Portal</h3>
             <p className="mt-3 text-sm text-violet-100 leading-relaxed">
               Selamat datang di portal pengaduan internal sekolah. Kami berkomitmen untuk mendengar aspirasi Anda demi menciptakan lingkungan sekolah yang nyaman dan berprestasi.
             </p>
