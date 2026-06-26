@@ -242,7 +242,7 @@ const Dashboard = () => {
       <div>
         <h1 className="text-2xl font-bold text-slate-800">Ringkasan Dashboard</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Pantau status laporan pengaduan sekolah hari ini.
+            Melihat status laporan pengaduan sekolah hari ini.
         </p>
       </div>
 
