@@ -59,7 +59,7 @@ const Login = () => {
             Masuk Website Sekolah SD Negeri 1 Cigombong
           </h2>
           <p className="mt-2 text-center text-sm text-slate-500">
-            Sistem Informasi Pengaduan Sekolah (SIPEKAN)
+            Sistem Pengaduan Sekolah (SIPESEK)
           </p>
         </div>
 
