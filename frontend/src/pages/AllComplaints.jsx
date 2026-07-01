@@ -26,9 +26,13 @@ const AllComplaints = () => {
     fetchComplaints();
   }, []);
 
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = async (id, newStatus, comment) => {
     try {
-      await API.put(`/data/${id}`, { status: newStatus });
+      const payload = { status: newStatus };
+      if (comment !== undefined) {
+        payload.admin_comment = comment;
+      }
+      await API.put(`/data/${id}`, payload);
       // Refresh complaints list
       fetchComplaints();
     } catch (error) {
