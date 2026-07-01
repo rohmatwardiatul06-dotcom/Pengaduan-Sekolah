@@ -39,7 +39,7 @@ const register = async (req, res, next) => {
       username: username.trim(),
       email: email.trim().toLowerCase(),
       password: hashedPassword,
-      role: role || 'user'
+      role: 'user'
     });
 
     res.status(201).json({
@@ -97,4 +97,38 @@ const login = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login };
+const getUsers = async (req, res, next) => {
+  try {
+    const users = await User.findAll();
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateUserRole = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    if (!role || !['guru', 'user'].includes(role)) {
+      return res.status(400).json({ message: 'Role tidak valid. Hanya bisa merubah ke guru atau user.' });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User tidak ditemukan.' });
+    }
+
+    if (user.role === 'admin') {
+      return res.status(403).json({ message: 'Akses ditolak. Tidak bisa mengubah role Admin Utama.' });
+    }
+
+    await User.updateRole(id, role);
+    res.status(200).json({ message: `Role berhasil diperbarui menjadi ${role}.` });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { register, login, getUsers, updateUserRole };

@@ -1,5 +1,4 @@
 const express = require('express');
-// 1. Pastikan baris ini berada tepat di bawah express
 const router = express.Router(); 
 
 const {
