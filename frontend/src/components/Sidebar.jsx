@@ -9,7 +9,8 @@ import {
   User, 
   Shield, 
   X,
-  Megaphone
+  Megaphone,
+  Users
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
@@ -22,10 +23,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   };
 
   const navItems = [
-    { name: 'Dashboard', to: '/', icon: Home, roles: ['admin', 'user'] },
+    { name: 'Dashboard', to: '/', icon: Home, roles: ['admin', 'guru', 'user'] },
     { name: 'Pengaduan Saya', to: '/my-complaints', icon: FileText, roles: ['user'] },
-    { name: 'Kelola Pengaduan', to: '/all-complaints', icon: Shield, roles: ['admin'] },
-    { name: 'Buat Pengaduan', to: '/create', icon: PlusCircle, roles: ['user'] },
+    { name: 'Kelola Pengaduan', to: '/all-complaints', icon: Shield, roles: ['admin', 'guru'] },
+    { name: 'Kelola Pengguna', to: '/users', icon: Users, roles: ['admin'] },
   ];
 
   return (
@@ -68,8 +69,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <span className="mt-1 text-xs font-medium uppercase tracking-wider text-slate-500 flex items-center gap-1">
             {user?.role === 'admin' ? (
               <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-400 text-[10px]">Admin</span>
+            ) : user?.role === 'guru' ? (
+              <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-amber-400 text-[10px]">Guru</span>
             ) : (
-              <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-blue-400 text-[10px]">Siswa / User</span>
+              <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-blue-400 text-[10px]">Siswa</span>
             )}
           </span>
         </div>
