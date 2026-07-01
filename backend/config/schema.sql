@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(50) UNIQUE NOT NULL,
   email VARCHAR(100) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
-  role ENUM('admin', 'user') DEFAULT 'user',
+  role ENUM('admin', 'guru', 'user') DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -20,9 +20,10 @@ CREATE TABLE IF NOT EXISTS complaints (
   user_id INT NOT NULL,
   title VARCHAR(255) NOT NULL,
   content TEXT NOT NULL,
-  category ENUM('Fasilitas', 'Akademik', 'Disiplin & Bullying', 'Administrasi & Keuangan') NOT NULL,
+  category ENUM('Fasilitas', 'Akademik', 'Disiplin & Bullying', 'Administrasi & Keuangan', 'Lainnya') NOT NULL,
   status ENUM('pending', 'proses', 'selesai', 'ditolak') DEFAULT 'pending',
   image_url VARCHAR(255) NULL,
+  admin_comment TEXT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
