@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import API from '../services/api';
 import ComplaintTable from '../components/ComplaintTable';
+import ComplaintForm from '../components/ComplaintForm';
 import { AlertCircle, Plus } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 const MyComplaints = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchComplaints = async () => {
     try {
@@ -40,6 +41,24 @@ const MyComplaints = () => {
     }
   };
 
+  const handleStatusChange = async (id, newStatus, comment) => {
+    try {
+      const payload = {};
+      if (newStatus !== undefined) {
+        payload.status = newStatus;
+      }
+      if (comment !== undefined) {
+        payload.admin_comment = comment;
+      }
+      await API.put(`/data/${id}`, payload);
+      // Refresh list
+      fetchComplaints();
+    } catch (error) {
+      console.error('Error updating complaint:', error);
+      alert(error.response?.data?.message || 'Gagal mengirim komentar.');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -47,16 +66,16 @@ const MyComplaints = () => {
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Daftar Pengaduan Saya</h1>
           <p className="text-sm text-slate-500 mt-1">
-            Melihat status danlaporan pengaduan yang Anda buat.
+            Melihat status dan laporan pengaduan yang Anda buat.
           </p>
         </div>
-        <Link
-          to="/create"
+        <button
+          onClick={() => setIsModalOpen(true)}
           className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-violet-600/10 self-start"
         >
           <Plus className="h-4 w-4" />
-          Buat Laporan 
-        </Link>
+          Buat Laporan Baru
+        </button>
       </div>
 
       {errorMsg && (
@@ -70,9 +89,25 @@ const MyComplaints = () => {
       <ComplaintTable
         complaints={complaints}
         onDelete={handleDelete}
+        onStatusChange={handleStatusChange}
         loading={loading}
         showReporter={false}
       />
+
+      {/* Modal Popup untuk Buat Laporan Baru */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <ComplaintForm 
+              onSuccess={() => {
+                setIsModalOpen(false);
+                fetchComplaints();
+              }}
+              onCancel={() => setIsModalOpen(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
