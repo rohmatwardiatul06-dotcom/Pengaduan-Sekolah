@@ -35,8 +35,8 @@ const getComplaintById = async (req, res, next) => {
       return res.status(404).json({ message: 'Pengaduan tidak ditemukan.' });
     }
 
-    // Authorization: User can only see their own complaint. Admin can see any.
-    if (role !== 'admin' && complaint.user_id !== userId) {
+    // Authorization: User can only see their own complaint. Admin & Guru can see any.
+    if (role !== 'admin' && role !== 'guru' && complaint.user_id !== userId) {
       return res.status(403).json({ message: 'Akses ditolak. Anda tidak berwenang melihat pengaduan ini.' });
     }
 
@@ -65,7 +65,7 @@ const createComplaint = async (req, res, next) => {
       return res.status(400).json({ message: 'Isi laporan harus menjelaskan detail laporan (minimal 15 karakter).' });
     }
     
-    const validCategories = ['Fasilitas', 'Akademik', 'Disiplin & Bullying', 'Administrasi & Keuangan'];
+    const validCategories = ['Fasilitas', 'Akademik', 'Disiplin & Bullying', 'Administrasi & Keuangan', 'Lainnya'];
     if (!category || !validCategories.includes(category)) {
       return res.status(400).json({ message: 'Kategori pengaduan tidak valid.' });
     }
@@ -81,7 +81,7 @@ const createComplaint = async (req, res, next) => {
       title: title.trim(),
       content: content.trim(),
       category,
-      image_url: imageUrl
+      imageUrl: imageUrl
     });
 
     res.status(201).json({
@@ -97,7 +97,7 @@ const createComplaint = async (req, res, next) => {
 const updateComplaint = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { title, content, category, status } = req.body || {};
+    const { title, content, category, status, admin_comment } = req.body || {};
     const { id: userId, role } = req.user;
 
     const complaint = await Complaint.findById(id);
@@ -107,20 +107,24 @@ const updateComplaint = async (req, res, next) => {
     }
 
     // Authorization Check
-    if (role !== 'admin') {
+    if (role !== 'admin' && role !== 'guru') {
       if (complaint.user_id !== userId) {
-        return res.status(403).json({ message: 'Akses ditolak. Anda tidak berwenang mengedit pengaduan ini.' });
+        return res.status(403).json({ message: 'Akses ditolak. Anda tidak berwenang mengakses pengaduan ini.' });
       }
-      if (complaint.status !== 'pending') {
-        return res.status(400).json({ message: 'Laporan tidak dapat diubah karena sedang diproses atau sudah selesai.' });
-      }
-      if (status !== undefined && status !== complaint.status) {
-        return res.status(400).json({ message: 'User tidak berwenang mengubah status pengaduan.' });
+      
+      const isEditingDetails = title !== undefined || content !== undefined || category !== undefined || (status !== undefined && status !== complaint.status);
+      if (isEditingDetails) {
+        if (complaint.status !== 'pending') {
+          return res.status(400).json({ message: 'Laporan tidak dapat diubah karena sedang diproses atau sudah selesai.' });
+        }
+        if (status !== undefined && status !== complaint.status) {
+          return res.status(400).json({ message: 'User tidak berwenang mengubah status pengaduan.' });
+        }
       }
     }
 
-    // Input Validation for non-admin updates
-    if (role !== 'admin') {
+    // Input Validation for non-admin and non-guru updates (only if fields are being updated)
+    if (role !== 'admin' && role !== 'guru') {
       if (title !== undefined && title.trim().length < 5) {
         return res.status(400).json({ message: 'Judul pengaduan harus minimal 5 karakter.' });
       }
@@ -128,14 +132,14 @@ const updateComplaint = async (req, res, next) => {
         return res.status(400).json({ message: 'Isi laporan harus menjelaskan detail laporan (minimal 15 karakter).' });
       }
       
-      const validCategories = ['Fasilitas', 'Akademik', 'Disiplin & Bullying', 'Administrasi & Keuangan'];
+      const validCategories = ['Fasilitas', 'Akademik', 'Disiplin & Bullying', 'Administrasi & Keuangan', 'Lainnya'];
       if (category !== undefined && !validCategories.includes(category)) {
         return res.status(400).json({ message: 'Kategori pengaduan tidak valid.' });
       }
     }
 
-    // Admin status validation
-    if (role === 'admin' && status !== undefined) {
+    // Admin & Guru status validation
+    if ((role === 'admin' || role === 'guru') && status !== undefined) {
       const validStatuses = ['pending', 'proses', 'selesai', 'ditolak'];
       if (!validStatuses.includes(status)) {
         return res.status(400).json({ message: 'Status pengaduan tidak valid.' });
@@ -148,12 +152,50 @@ const updateComplaint = async (req, res, next) => {
       imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
     }
 
+    let finalAdminComment = complaint.admin_comment;
+
+    if (admin_comment !== undefined && admin_comment.trim() !== '') {
+      const commentsList = [];
+      if (complaint.admin_comment) {
+        try {
+          const parsed = JSON.parse(complaint.admin_comment);
+          if (Array.isArray(parsed)) {
+            commentsList.push(...parsed);
+          } else {
+            commentsList.push({
+              sender_role: 'admin',
+              sender_name: 'Admin',
+              text: complaint.admin_comment,
+              created_at: complaint.updated_at || new Date().toISOString()
+            });
+          }
+        } catch (e) {
+          commentsList.push({
+            sender_role: 'admin',
+            sender_name: 'Admin',
+            text: complaint.admin_comment,
+            created_at: complaint.updated_at || new Date().toISOString()
+          });
+        }
+      }
+
+      commentsList.push({
+        sender_role: role,
+        sender_name: req.user.username,
+        text: admin_comment.trim(),
+        created_at: new Date().toISOString()
+      });
+
+      finalAdminComment = JSON.stringify(commentsList);
+    }
+
     const updated = await Complaint.update(id, {
       title: title !== undefined ? title.trim() : complaint.title,
       content: content !== undefined ? content.trim() : complaint.content,
       category: category || complaint.category,
       status: status || complaint.status,
-      image_url: imageUrl
+      imageUrl: imageUrl,
+      adminComment: finalAdminComment
     });
 
     if (!updated) {
