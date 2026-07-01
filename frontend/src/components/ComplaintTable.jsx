@@ -9,7 +9,9 @@ import {
   User,
   Search,
   RefreshCw,
+  MessageSquare
 } from "lucide-react";
+import CommentModal from "./CommentModal";
 
 const ComplaintTable = ({
   complaints,
@@ -25,6 +27,25 @@ const ComplaintTable = ({
   const [categoryFilter, setCategoryFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
+  // Comments Popup Modal State
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+
+  const getCommentCount = (adminComment) => {
+    if (!adminComment) return 0;
+    try {
+      const parsed = JSON.parse(adminComment);
+      return Array.isArray(parsed) ? parsed.length : 1;
+    } catch (e) {
+      return 1;
+    }
+  };
+
+  const handleOpenComments = (item) => {
+    setSelectedComplaint(item);
+    setIsCommentModalOpen(true);
+  };
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -34,6 +55,7 @@ const ComplaintTable = ({
     "Akademik",
     "Disiplin & Bullying",
     "Administrasi & Keuangan",
+    "Lainnya",
   ];
 
   // Reset pagination on search/filter change
@@ -115,6 +137,13 @@ const ComplaintTable = ({
             Ditolak
           </span>
         );
+      case 'lainnya':
+        return (
+          <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 border border-slate-200">
+            <span className="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
+            Lainnya
+          </span>
+        );
       default:
         return null;
     }
@@ -170,6 +199,7 @@ const ComplaintTable = ({
         <table className="w-full border-collapse text-left text-sm text-slate-600">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50 font-semibold text-slate-700">
+              <th className="px-6 py-4 w-12">No.</th>
               {showReporter && <th className="px-6 py-4">Pelapor</th>}
               <th className="px-6 py-4">Detail Laporan</th>
               <th className="px-6 py-4">Kategori</th>
@@ -182,7 +212,7 @@ const ComplaintTable = ({
             {loading ? (
               <tr>
                 <td
-                  colSpan={showReporter ? 6 : 5}
+                  colSpan={showReporter ? 7 : 6}
                   className="px-6 py-12 text-center text-slate-400"
                 >
                   <div className="flex justify-center items-center gap-2">
@@ -194,18 +224,23 @@ const ComplaintTable = ({
             ) : currentItems.length === 0 ? (
               <tr>
                 <td
-                  colSpan={showReporter ? 6 : 5}
+                  colSpan={showReporter ? 7 : 6}
                   className="px-6 py-12 text-center text-slate-400"
                 >
                   Tidak ditemukan laporan pengaduan.
                 </td>
               </tr>
             ) : (
-              currentItems.map((item) => (
+              currentItems.map((item, index) => (
                 <tr
                   key={item.id}
                   className="hover:bg-slate-50/50 transition-colors"
                 >
+                  {/* Numbering */}
+                  <td className="px-6 py-4 font-semibold text-slate-700">
+                    {indexOfFirstItem + index + 1}
+                  </td>
+
                   {/* Reporter Username (for Admin view) */}
                   {showReporter && (
                     <td className="px-6 py-4 font-medium text-slate-900">
@@ -222,7 +257,17 @@ const ComplaintTable = ({
                   <td className="px-6 py-4">
                     <div>
                       <p className="font-semibold text-slate-800 line-clamp-1">{item.title}</p>
-                      <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">{item.content}</p>
+                      <p className="text-xs text-slate-400 line-clamp-2 mt-0.5">{item.content}</p>
+                      
+                      {/* Comments Thread Toggle Button */}
+                      <button
+                        onClick={() => handleOpenComments(item)}
+                        className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-violet-50 hover:bg-violet-100 border border-violet-150 rounded-lg text-[10px] font-semibold text-violet-700 transition-colors"
+                      >
+                        <MessageSquare className="h-3 w-3" />
+                        <span>Tanggapan & Diskusi ({getCommentCount(item.admin_comment)})</span>
+                      </button>
+
                       {item.image_url && (
                         <div className="mt-2">
                           <a 
@@ -259,9 +304,9 @@ const ComplaintTable = ({
                     </div>
                   </td>
 
-                  {/* Status Badge or Admin Selector */}
+                  {/* Status Badge or Admin/Guru Selector */}
                   <td className="px-6 py-4">
-                    {user?.role === "admin" ? (
+                    {user?.role === "admin" || user?.role === "guru" ? (
                       <select
                         value={item.status}
                         onChange={(e) =>
@@ -273,6 +318,7 @@ const ComplaintTable = ({
                         <option value="proses">Diproses</option>
                         <option value="selesai">Selesai</option>
                         <option value="ditolak">Ditolak</option>
+                        <option value="lainnya">Lainnya</option>
                       </select>
                     ) : (
                       getStatusBadge(item.status)
@@ -282,7 +328,7 @@ const ComplaintTable = ({
                   {/* Actions */}
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {user?.role !== "admin" && item.status === "pending" ? (
+                      {user?.role !== "admin" && user?.role !== "guru" && item.status === "pending" ? (
                         <>
                           <Link
                             to={`/edit/${item.id}`}
@@ -301,7 +347,7 @@ const ComplaintTable = ({
                         </>
                       ) : (
                         <span className="text-xs font-medium text-slate-400 select-none">
-                          {user?.role === "admin"
+                          {user?.role === "admin" || user?.role === "guru"
                             ? "Kelola Status"
                             : "Terkunci"}
                         </span>
@@ -342,6 +388,20 @@ const ComplaintTable = ({
             </button>
           </div>
         </div>
+      )}
+
+      {/* Discussion/Comments Modal Popup */}
+      {isCommentModalOpen && selectedComplaint && (
+        <CommentModal
+          complaint={complaints.find(c => c.id === selectedComplaint.id) || selectedComplaint}
+          onClose={() => {
+            setIsCommentModalOpen(false);
+            setSelectedComplaint(null);
+          }}
+          onAddComment={async (text) => {
+            await onStatusChange(selectedComplaint.id, undefined, text);
+          }}
+        />
       )}
     </div>
   );

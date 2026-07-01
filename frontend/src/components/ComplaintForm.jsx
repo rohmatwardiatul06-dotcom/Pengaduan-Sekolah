@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import API from '../services/api';
 import { AlertCircle, CheckCircle2, Loader2, ArrowLeft, Camera, X } from 'lucide-react';
 
-const ComplaintForm = ({ initialData = null, isEdit = false }) => {
+const ComplaintForm = ({ initialData = null, isEdit = false, onSuccess = null, onCancel = null }) => {
   // JavaScript Dasar: Object state
   const [formData, setFormData] = useState({
     title: '',
@@ -16,7 +16,8 @@ const ComplaintForm = ({ initialData = null, isEdit = false }) => {
     'Fasilitas',
     'Akademik',
     'Disiplin & Bullying',
-    'Administrasi & Keuangan'
+    'Administrasi & Keuangan',
+    'Lainnya'
   ];
 
   const [imageFile, setImageFile] = useState(null);
@@ -146,7 +147,11 @@ const ComplaintForm = ({ initialData = null, isEdit = false }) => {
       }
       
       setTimeout(() => {
-        navigate(isEdit ? `/my-complaints` : '/');
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          navigate(isEdit ? `/my-complaints` : '/');
+        }
       }, 1500);
 
     } catch (error) {
@@ -161,7 +166,7 @@ const ComplaintForm = ({ initialData = null, isEdit = false }) => {
     <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm max-w-2xl mx-auto">
       <div className="flex items-center gap-2 mb-6">
         <button 
-          onClick={() => navigate(-1)} 
+          onClick={() => onCancel ? onCancel() : navigate(-1)} 
           className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -313,7 +318,7 @@ const ComplaintForm = ({ initialData = null, isEdit = false }) => {
         <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => onCancel ? onCancel() : navigate(-1)}
             disabled={loading}
             className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-medium text-sm hover:bg-slate-50 transition-colors disabled:opacity-50"
           >

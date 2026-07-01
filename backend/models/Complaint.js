@@ -10,6 +10,7 @@ class Complaint {
     this.category = data.category;
     this.status = data.status;
     this.image_url = data.image_url;
+    this.admin_comment = data.admin_comment;
     this.created_at = data.created_at;
     this.updated_at = data.updated_at;
   }
@@ -35,8 +36,8 @@ class Complaint {
     `;
     const params = [];
 
-    // Authorization: Normal user can only see their own complaints, Admin can see all
-    if (role !== 'admin' && userId) {
+    // Authorization: Normal user can only see their own complaints, Admin & Guru can see all
+    if (role !== 'admin' && role !== 'guru' && userId) {
       sql += ' AND c.user_id = ?';
       params.push(userId);
     }
@@ -75,7 +76,7 @@ class Complaint {
   }
 
   // Update an existing complaint
-  static async update(id, { title, content, category, status, imageUrl }) {
+  static async update(id, { title, content, category, status, imageUrl, adminComment }) {
     const fields = [];
     const params = [];
 
@@ -84,6 +85,7 @@ class Complaint {
     if (category !== undefined) { fields.push('category = ?'); params.push(category); }
     if (status !== undefined) { fields.push('status = ?'); params.push(status); }
     if (imageUrl !== undefined) { fields.push('image_url = ?'); params.push(imageUrl); }
+    if (adminComment !== undefined) { fields.push('admin_comment = ?'); params.push(adminComment); }
 
     if (fields.length === 0) return false;
 
@@ -101,22 +103,24 @@ class Complaint {
     return result.affectedRows > 0;
   }
 
-  // Calculate statistics (total, pending, proses, selesai, ditolak)
+  // Calculate statistics (total, pending, proses, selesai, ditolak, lainnya)
   static async getStats(userId, role) {
     let sqlTotal = 'SELECT COUNT(*) as total FROM complaints';
     let sqlPending = "SELECT COUNT(*) as pending FROM complaints WHERE status = 'pending'";
     let sqlProses = "SELECT COUNT(*) as proses FROM complaints WHERE status = 'proses'";
     let sqlSelesai = "SELECT COUNT(*) as selesai FROM complaints WHERE status = 'selesai'";
     let sqlDitolak = "SELECT COUNT(*) as ditolak FROM complaints WHERE status = 'ditolak'";
+    let sqlLainnya = "SELECT COUNT(*) as lainnya FROM complaints WHERE status = 'lainnya'";
     
     const params = [];
-    if (role !== 'admin' && userId) {
+    if (role !== 'admin' && role !== 'guru' && userId) {
       const filter = ' WHERE user_id = ?';
       sqlTotal += filter;
       sqlPending += ' AND user_id = ?';
       sqlProses += ' AND user_id = ?';
       sqlSelesai += ' AND user_id = ?';
       sqlDitolak += ' AND user_id = ?';
+      sqlLainnya += ' AND user_id = ?';
       params.push(userId);
     }
 
@@ -127,18 +131,21 @@ class Complaint {
     const prosesParams = [...params];
     const selesaiParams = [...params];
     const ditolakParams = [...params];
+    const lainnyaParams = [...params];
 
     const [pendingRes] = await db.query(sqlPending, pendingParams);
     const [prosesRes] = await db.query(sqlProses, prosesParams);
     const [selesaiRes] = await db.query(sqlSelesai, selesaiParams);
     const [ditolakRes] = await db.query(sqlDitolak, ditolakParams);
+    const [lainnyaRes] = await db.query(sqlLainnya, lainnyaParams);
 
     return {
       total: totalRes.total,
       pending: pendingRes.pending,
       proses: prosesRes.proses,
       selesai: selesaiRes.selesai,
-      ditolak: ditolakRes.ditolak
+      ditolak: ditolakRes.ditolak,
+      lainnya: lainnyaRes.lainnya
     };
   }
 }

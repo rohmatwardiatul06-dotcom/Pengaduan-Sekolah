@@ -39,6 +39,18 @@ class User {
     );
     return result.insertId;
   }
+
+  // Find all users (excluding passwords for safety)
+  static async findAll() {
+    const rows = await db.query('SELECT id, username, email, role, created_at FROM users ORDER BY created_at DESC');
+    return rows.map(row => new User(row));
+  }
+
+  // Update a user's role
+  static async updateRole(id, role) {
+    const result = await db.query('UPDATE users SET role = ? WHERE id = ?', [role, id]);
+    return result.affectedRows > 0;
+  }
 }
 
 module.exports = User;
