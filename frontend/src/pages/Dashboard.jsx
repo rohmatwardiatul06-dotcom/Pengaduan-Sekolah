@@ -22,7 +22,7 @@ const Dashboard = () => {
 
       // GET /data
       const complaintsRes = await API.get('/data');
-      if (user?.role === 'admin') {
+      if (user?.role === 'admin' || user?.role === 'guru') {
         setAllComplaints(complaintsRes.data.data);
       } else {
         setRecent(complaintsRes.data.data.slice(0, 3));
@@ -38,9 +38,13 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [user?.role]);
 
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = async (id, newStatus, comment) => {
     try {
-      await API.put(`/data/${id}`, { status: newStatus });
+      const payload = { status: newStatus };
+      if (comment !== undefined) {
+        payload.admin_comment = comment;
+      }
+      await API.put(`/data/${id}`, payload);
       // Refresh stats and data
       const statsRes = await API.get('/stats');
       setStats(statsRes.data.data);
@@ -72,13 +76,14 @@ const Dashboard = () => {
     );
   }
 
-  // Admin Dashboard
-  if (user?.role === 'admin') {
+  // Admin & Guru Dashboard
+  if (user?.role === 'admin' || user?.role === 'guru') {
     const categoriesList = [
       'Fasilitas',
       'Akademik',
       'Disiplin & Bullying',
-      'Administrasi & Keuangan'
+      'Administrasi & Keuangan',
+      'Lainnya'
     ];
 
     const categoryStats = categoriesList.map(cat => {
@@ -100,9 +105,13 @@ const Dashboard = () => {
         {/* Header */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-700 p-6 text-white shadow-md shadow-violet-600/10">
           <div className="relative z-10">
-            <h1 className="text-2xl font-bold font-display">Dashboard Administrator</h1>
+            <h1 className="text-2xl font-bold font-display">
+              {user?.role === 'admin' ? 'Dashboard Administrator' : 'Dashboard Guru'}
+            </h1>
             <p className="text-sm text-violet-100 mt-1">
-              Pantau statistik ringkas dan kelola seluruh pengaduan siswa secara real-time.
+              {user?.role === 'admin' 
+                ? 'Pantau statistik ringkas dan kelola seluruh pengaduan siswa secara real-time.' 
+                : 'Pantau statistik ringkas dan proses laporan pengaduan siswa sebagai Guru.'}
             </p>
           </div>
           <div className="absolute -bottom-8 -right-8 h-32 w-32 rounded-full bg-white/5 opacity-20 pointer-events-none"></div>
@@ -219,7 +228,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Management Table Component for Admin */}
+        {/* Management Table Component for Admin & Guru */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-800">Kelola Seluruh Pengaduan</h2>
@@ -365,7 +374,7 @@ const Dashboard = () => {
           <div className="mt-6 pt-6 border-t border-white/10">
             {user?.role === 'user' ? (
               <Link
-                to="/create"
+                to="/my-complaints"
                 className="w-full inline-flex justify-center items-center gap-1.5 px-4 py-2.5 bg-white text-violet-750 font-semibold rounded-xl text-sm transition-all hover:bg-violet-50 text-center"
               >
                 Buat Laporan Baru
