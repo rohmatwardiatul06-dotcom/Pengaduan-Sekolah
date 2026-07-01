@@ -58,7 +58,7 @@ const Login = () => {
             <Megaphone className="h-6 w-6" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-slate-900 font-display">
-            Masuk Website Sekolah
+            Masuk Website Sekolah SMA Negeri 1 Cigombong
           </h2>
           <p className="mt-2 text-center text-sm text-slate-500">
             SMA Negeri 1 Cigombong - Sistem Pengaduan Sekolah (SIPESEK)
