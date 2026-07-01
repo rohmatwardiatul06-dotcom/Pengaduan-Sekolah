@@ -1,5 +1,6 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router(); 
+
 const {
   getComplaints,
   getComplaintById,
@@ -9,18 +10,20 @@ const {
   getStats
 } = require('../controllers/complaintController');
 const { verifyToken } = require('../middlewares/authMiddleware');
+const upload = require('../middlewares/uploadMiddleware'); 
 
-// Proteksi seluruh route pengaduan dengan token JWT
+// 2. Sekarang baru aman memanggil router.use karena variabel router sudah ada
 router.use(verifyToken);
 
-// REST API Endpoints sesuai spesifikasi minimal
+// REST API Endpoints 
 router.get('/data', getComplaints);
 router.get('/data/:id', getComplaintById);
-router.post('/data', createComplaint);
-router.put('/data/:id', updateComplaint);
-router.delete('/data/:id', deleteComplaint);
 
-// Endpoint tambahan untuk visualisasi dashboard
+// Jangan lupa pasang upload.single('image') di sini ya!
+router.post('/data', upload.single('image'), createComplaint);
+router.put('/data/:id', upload.single('image'), updateComplaint);
+
+router.delete('/data/:id', deleteComplaint);
 router.get('/stats', getStats);
 
 module.exports = router;

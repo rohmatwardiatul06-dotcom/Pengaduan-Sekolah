@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import { AlertCircle, Loader2, LogIn, Megaphone } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { AlertCircle, Loader2, LogIn, Megaphone } from "lucide-react";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  
+  const [errorMsg, setErrorMsg] = useState("");
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const validate = () => {
     const tempErrors = {};
     if (!email.trim()) {
-      tempErrors.email = 'Email wajib diisi.';
+      tempErrors.email = "Email wajib diisi.";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      tempErrors.email = 'Format email tidak valid.';
+      tempErrors.email = "Format email tidak valid.";
     }
-    
+
     if (!password) {
-      tempErrors.password = 'Password wajib diisi.';
+      tempErrors.password = "Password wajib diisi.";
     }
 
     setErrors(tempErrors);
@@ -34,13 +34,15 @@ const Login = () => {
     if (!validate()) return;
 
     setLoading(true);
-    setErrorMsg('');
+    setErrorMsg("");
 
     try {
       await login(email.trim(), password);
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      const msg = error.response?.data?.message || 'Login gagal. Periksa kembali email dan password Anda.';
+      const msg =
+        error.response?.data?.message ||
+        "Login gagal. Periksa kembali email dan password Anda.";
       setErrorMsg(msg);
     } finally {
       setLoading(false);
@@ -56,10 +58,10 @@ const Login = () => {
             <Megaphone className="h-6 w-6" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-slate-900 font-display">
-            Masuk Website Sekolah SD Negeri 1 Cigombong
+            Masuk Website Sekolah SMA Negeri 1 Cigombong
           </h2>
           <p className="mt-2 text-center text-sm text-slate-500">
-            Sistem Informasi Pengaduan Sekolah (SIPEKAN)
+            SMA Negeri 1 Cigombong - Sistem Pengaduan Sekolah (SIPESEK)
           </p>
         </div>
 
@@ -75,7 +77,10 @@ const Login = () => {
           <form className="space-y-5" onSubmit={handleSubmit}>
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-1.5">
+              <label
+                htmlFor="email"
+                className="block text-sm font-semibold text-slate-700 mb-1.5"
+              >
                 Email
               </label>
               <input
@@ -84,13 +89,14 @@ const Login = () => {
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
+                  if (errors.email)
+                    setErrors((prev) => ({ ...prev, email: "" }));
                 }}
                 placeholder="nama@sekolah.sch.id"
                 className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 text-sm ${
-                  errors.email 
-                    ? 'border-rose-300 focus:ring-rose-200 focus:border-rose-400' 
-                    : 'border-slate-200 focus:ring-violet-200 focus:border-violet-400'
+                  errors.email
+                    ? "border-rose-300 focus:ring-rose-200 focus:border-rose-400"
+                    : "border-slate-200 focus:ring-violet-200 focus:border-violet-400"
                 }`}
               />
               {errors.email && (
@@ -102,7 +108,10 @@ const Login = () => {
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-1.5">
+              <label
+                htmlFor="password"
+                className="block text-sm font-semibold text-slate-700 mb-1.5"
+              >
                 Password
               </label>
               <input
@@ -111,13 +120,14 @@ const Login = () => {
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
-                  if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
+                  if (errors.password)
+                    setErrors((prev) => ({ ...prev, password: "" }));
                 }}
                 placeholder="••••••••"
                 className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 text-sm ${
-                  errors.password 
-                    ? 'border-rose-300 focus:ring-rose-200 focus:border-rose-400' 
-                    : 'border-slate-200 focus:ring-violet-200 focus:border-violet-400'
+                  errors.password
+                    ? "border-rose-300 focus:ring-rose-200 focus:border-rose-400"
+                    : "border-slate-200 focus:ring-violet-200 focus:border-violet-400"
                 }`}
               />
               {errors.password && (
@@ -144,8 +154,11 @@ const Login = () => {
 
           {/* Helper Register Link */}
           <div className="mt-6 text-center text-sm text-slate-500 border-t border-slate-100 pt-6">
-            Belum punya akun?{' '}
-            <Link to="/register" className="font-semibold text-violet-600 hover:text-violet-500">
+            Belum punya akun?{" "}
+            <Link
+              to="/register"
+              className="font-semibold text-violet-600 hover:text-violet-500"
+            >
               Daftar Akun Baru
             </Link>
           </div>

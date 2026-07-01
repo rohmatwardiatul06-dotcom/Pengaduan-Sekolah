@@ -7,7 +7,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import MyComplaints from './pages/MyComplaints';
 import AllComplaints from './pages/AllComplaints';
-import CreateComplaint from './pages/CreateComplaint';
+import UserManagement from './pages/UserManagement';
 import EditComplaint from './pages/EditComplaint';
 
 function App() {
@@ -26,10 +26,10 @@ function App() {
             
             {/* User-only Routes */}
             <Route path="my-complaints" element={<MyComplaints />} />
-            <Route path="create" element={<CreateComplaint />} />
             
             {/* Admin-only Routes */}
             <Route path="all-complaints" element={<AllComplaints />} />
+            <Route path="users" element={<UserManagement />} />
             
             {/* Shared Edit Route (validation inside component) */}
             <Route path="edit/:id" element={<EditComplaint />} />
